@@ -58,7 +58,7 @@
 | `description`| TEXT | 文字描述 | 允許空白 |
 | `created_at`| DATETIME | 發布時間 | 預設當前時間 |
 
-### 3. post_like 按讚紀錄表
+### 3. post_like 按讚記錄表
 防範重複按讚並記錄狀態。
 
 | 欄位名稱 | 資料型別 | 說明 | 備註 |
