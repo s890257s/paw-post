@@ -1,10 +1,10 @@
 -- 會員
 INSERT INTO member (username, password) VALUES
-('Alice', '1234'),
-('Bob', '1234'),
-('Charlie', '1234'),
-('David', '1234'),
-('Eve', '1234');
+('Alice', '$2a$10$XnH32heSv/TzbU9P.IMk7.sZi7pdYFVw4CpPV0JB7nF6r3kYnHkZG'),
+('Bob', '$2a$10$XnH32heSv/TzbU9P.IMk7.sZi7pdYFVw4CpPV0JB7nF6r3kYnHkZG'),
+('Charlie', '$2a$10$XnH32heSv/TzbU9P.IMk7.sZi7pdYFVw4CpPV0JB7nF6r3kYnHkZG'),
+('David', '$2a$10$XnH32heSv/TzbU9P.IMk7.sZi7pdYFVw4CpPV0JB7nF6r3kYnHkZG'),
+('Eve', '$2a$10$XnH32heSv/TzbU9P.IMk7.sZi7pdYFVw4CpPV0JB7nF6r3kYnHkZG');
 
 -- 貼文
 INSERT INTO post (member_id, image_data, description) VALUES

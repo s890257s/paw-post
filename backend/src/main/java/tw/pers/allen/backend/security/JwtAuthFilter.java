@@ -67,6 +67,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
+        // 永遠放行 CORS 的 Preflight 請求 (OPTIONS)
+        if (method.equalsIgnoreCase("OPTIONS")) {
+            return false;
+        }
+
         // 登入 API 不需驗證
         if (path.startsWith("/api/login")) {
             return false;
