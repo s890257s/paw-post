@@ -1,4 +1,4 @@
-package tw.pers.allen.backend.util;
+package tw.pers.allen.backend.security;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;

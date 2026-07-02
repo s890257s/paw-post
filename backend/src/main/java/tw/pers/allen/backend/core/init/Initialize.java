@@ -1,4 +1,4 @@
-package tw.pers.allen.backend.init;
+package tw.pers.allen.backend.core.init;
 
 import java.io.IOException;
 import java.util.List;

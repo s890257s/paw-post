@@ -1,4 +1,4 @@
-package tw.pers.allen.backend.filter;
+package tw.pers.allen.backend.security;
 
 import java.io.IOException;
 
@@ -11,8 +11,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import tw.pers.allen.backend.util.JwtUtil;
-import tw.pers.allen.backend.util.MemberContextHolder;
 
 // 自訂過濾器，用於攔截 HTTP 請求並驗證 JWT Token
 @Component

@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import tw.pers.allen.backend.model.dto.PostResponseDto;
 import tw.pers.allen.backend.service.PostService;
-import tw.pers.allen.backend.util.MemberContextHolder;
+import tw.pers.allen.backend.security.MemberContextHolder;
 
 // 處理貼文及按讚相關的 API 請求
 @RestController
@@ -56,7 +56,7 @@ public class PostController {
 
     // 對指定貼文按讚
     @PostMapping("/{id}/likes")
-    public ResponseEntity<Void> likePost(@PathVariable("id") Integer id) {
+    public ResponseEntity<Void> likePost(@PathVariable Integer id) {
         Integer memberId = MemberContextHolder.requireMemberId();
 
         postService.likePost(memberId, id);
@@ -65,7 +65,7 @@ public class PostController {
 
     // 取消對指定貼文的按讚
     @DeleteMapping("/{id}/likes")
-    public ResponseEntity<Void> unlikePost(@PathVariable("id") Integer id) {
+    public ResponseEntity<Void> unlikePost(@PathVariable Integer id) {
         Integer memberId = MemberContextHolder.getMemberId();
         if (memberId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

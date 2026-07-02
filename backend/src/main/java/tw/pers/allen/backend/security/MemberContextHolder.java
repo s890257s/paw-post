@@ -1,6 +1,6 @@
-package tw.pers.allen.backend.util;
+package tw.pers.allen.backend.security;
 
-import tw.pers.allen.backend.exception.UnauthorizedException;
+import tw.pers.allen.backend.core.exception.UnauthorizedException;
 
 // 使用 ThreadLocal 儲存當前請求的登入會員 ID
 public class MemberContextHolder {
