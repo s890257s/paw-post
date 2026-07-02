@@ -1,11 +1,24 @@
-<script setup></script>
+<script setup>
+import Navbar from './components/Navbar.vue';
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <v-app>
+    <!-- 頂部導覽列 -->
+    <Navbar />
+
+    <!-- 頁面主要內容區域 -->
+    <v-main class="bg-grey-lighten-4">
+      <router-view />
+    </v-main>
+  </v-app>
 </template>
 
-<style scoped></style>
+<style>
+/* 全域樣式設定 */
+body {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+</style>
