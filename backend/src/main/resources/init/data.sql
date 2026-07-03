@@ -1,13 +1,13 @@
 -- 會員
--- 密碼皆為 password123。
+-- 密碼皆為 1234。
 -- 注意：五筆 hash 各不相同 —— BCrypt 每次都會產生隨機 salt，
 -- 因此「相同的密碼」也會得到「不同的 hash」，這正是 BCrypt 防彩虹表攻擊的關鍵。
 INSERT INTO member (username, password, role) VALUES
-('Alice', '$2a$10$wqtUZRA6NrM.MxvqjN1/YeOQVs3Qv6D4DyU9pRwIYVsiO7sObQoAO', 'ADMIN'),
-('Bob', '$2a$10$ZE9Ct.gS5X/IHCbhvsiN6Oe1dLytE.dkpFre4qwKziuxk4xI12Ih2', 'USER'),
-('Charlie', '$2a$10$m6mHq8Hx4Sd6ee.gF0ErYu3jmagM3O1hHzjN/TguEg49SqUPcvYRS', 'USER'),
-('David', '$2a$10$hNBH1HDrtoZUT9i5SOuJMekIt6XABlDRJcg4qjZIfT4DyuDNrtDhq', 'USER'),
-('Eve', '$2a$10$klLp7BVuKYtQI.9QEdDN7.Pyb6y5sIj4bOuqF6wZ7fnP68MnsRwV6', 'USER');
+('Alice', '$2a$10$T7QrO1KovLSWa9v6l/kMjeKb519anC3K57IVupWvNstbWG.L4NVZC', 'ADMIN'),
+('Bob', '$2a$10$qFY/yAx1OMpdxODj5Kxyvu4/gsSg3LxjNWkUD8qMoffeI6AtylYl6', 'USER'),
+('Charlie', '$2a$10$7Q5agurg2vvfz/dviNs9Uelw0V/VA0t8vaCgNhX5S0lU/yb1eafCq', 'USER'),
+('David', '$2a$10$dtwGhXFnsfRtqGq/.CnHueo5227qO.hwvPN2iquPT6xNYwvuc/exu', 'USER'),
+('Eve', '$2a$10$c09tTM6LEiY7DBJhwSXN.OhsaRGAA3pF4mdzW6cmVm/.hW7VyctI2', 'USER');
 
 -- 貼文
 -- image_data 先以空值佔位，實際照片內容由 Initialize.java 於啟動後載入 (webp 格式)

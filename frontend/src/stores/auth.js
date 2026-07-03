@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import axios from 'axios';
 // 如果有登入用的獨立 api 方法可以放這裡，或是直接使用共用的 request
 import request from '@/api/request';
 
