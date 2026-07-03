@@ -28,7 +28,7 @@ app.use(vuetify);
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 app.use(Toast, {
-    position: "top-right", // 訊息顯示在右上角
+    position: "bottom-right", // 訊息顯示在右下角
     timeout: 3000,         // 訊息顯示 3 秒後自動消失
 });
 

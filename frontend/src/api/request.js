@@ -4,7 +4,7 @@ import { createToastInterface } from "vue-toastification";
 
 // 建立獨立的 Toast 實例給這個檔案使用 (設定與 main.js 保持一致)
 const toast = createToastInterface({
-    position: "top-right",
+    position: "bottom-right",
     timeout: 3000,
 });
 
