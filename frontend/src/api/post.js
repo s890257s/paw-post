@@ -8,12 +8,11 @@ export const getPosts = (page = 0, size = 10) => {
 };
 
 // 發布新照片
+// 注意：不需要手動設定 Content-Type: multipart/form-data ——
+// axios 偵測到 FormData 會自動附上正確的 header（包含必要的 boundary 參數），
+// 手動設定反而可能漏掉 boundary
 export const createPost = (formData) => {
-    return request.post('/posts', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    });
+    return request.post('/posts', formData);
 };
 
 // 對照片按讚

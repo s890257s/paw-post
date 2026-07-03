@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useAuthStore } from "../stores/auth";
 import { createToastInterface } from "vue-toastification";
+import router from "../router";
 
 // 建立獨立的 Toast 實例給這個檔案使用 (設定與 main.js 保持一致)
 const toast = createToastInterface({
@@ -10,7 +11,8 @@ const toast = createToastInterface({
 
 const instance = axios.create({
     baseURL: "http://localhost:8080/api",
-    timeout: 10000,
+    // 上傳圖片在較慢的網路可能超過 10 秒，放寬到 30 秒
+    timeout: 30000,
     headers: {
         "Content-Type": "application/json",
     },
@@ -44,28 +46,38 @@ instance.interceptors.response.use(
             return Promise.reject(error);
         }
 
+        // 使用 ?. (Optional Chaining) 防止後端沒有回傳 JSON 格式時發生「找不到屬性」的程式錯誤 (TypeError)
+        const backendMsg = error.response?.data?.message || error.response?.data?.error;
+
         switch (error.response.status) {
-            case 401:
-                toast.error("未授權，請重新登入");
-                // 處理 401 錯誤：呼叫 store 的 logout 來清除狀態
+            case 401: {
+                // 【特例】登入 API 本身的 401 代表「帳號或密碼錯誤」，
+                // 不是「登入狀態失效」，不能登出跳轉，否則錯誤訊息會被頁面跳轉吃掉
+                if (error.config?.url?.includes("/login")) {
+                    toast.error(backendMsg || "帳號或密碼錯誤");
+                    break;
+                }
+
+                // 其他 API 的 401：Token 無效或過期，清除狀態並回到登入頁。
+                // 用 router.push 而不是 window.location.href —— 後者會整頁重載，
+                // SPA 狀態全部消失，toast 也會來不及顯示
+                toast.error(backendMsg || "登入已失效，請重新登入");
                 const authStore = useAuthStore();
                 authStore.logout();
-                // 強制讓使用者回到登入頁面
-                window.location.href = "/login";
+                router.push("/login");
                 break;
+            }
             case 403:
-                toast.error("權限不足，您無法執行此操作");
+                toast.error(backendMsg || "權限不足，您無法執行此操作");
                 break;
             case 404:
-                toast.error("找不到資源");
+                toast.error(backendMsg || "找不到資源");
                 break;
             case 500:
                 toast.error("伺服器發生錯誤");
                 break;
             default:
-                // 使用 ?. (Optional Chaining) 防止後端沒有回傳 JSON 格式時發生「找不到屬性」的程式錯誤 (TypeError)
                 // 嘗試讀取後端的 message 或 error 欄位，若都沒有則顯示 axios 的預設錯誤訊息
-                const backendMsg = error.response?.data?.message || error.response?.data?.error;
                 toast.error("發生錯誤: " + (backendMsg || error.message));
         }
 

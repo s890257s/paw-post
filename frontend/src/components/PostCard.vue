@@ -1,5 +1,7 @@
 <script setup>
-import { defineProps, defineEmits, computed } from 'vue';
+// defineProps / defineEmits 是編譯器巨集 (compiler macro)，不需要 import，
+// import 反而會在 console 產生警告
+import { ref, computed } from 'vue';
 import { useAuthStore } from '../stores/auth';
 import { likePost, unlikePost } from '../api/post';
 import { useToast } from 'vue-toastification';
@@ -32,11 +34,17 @@ const formattedDate = computed(() => {
   });
 });
 
+// 防止快速連點造成重複請求
+const isProcessing = ref(false);
+
 const handleLike = async () => {
   if (!authStore.token) {
     toast.info('請先登入才能按讚喔！');
     return;
   }
+
+  if (isProcessing.value) return;
+  isProcessing.value = true;
 
   try {
     if (isLiked.value) {
@@ -48,6 +56,8 @@ const handleLike = async () => {
     }
   } catch (error) {
     console.error('按讚操作失敗', error);
+  } finally {
+    isProcessing.value = false;
   }
 };
 </script>

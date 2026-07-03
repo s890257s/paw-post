@@ -1,10 +1,12 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { getPosts } from '../api/post';
+import { useFeedStore } from '../stores/feed';
 import PostCard from '../components/PostCard.vue';
 import { useToast } from 'vue-toastification';
 
 const toast = useToast();
+const feedStore = useFeedStore();
 const posts = ref([]);
 const page = ref(0);
 const totalPages = ref(1);
@@ -46,6 +48,12 @@ const handlePostUpdate = (updatedPost) => {
 };
 
 onMounted(() => {
+  loadPosts(true);
+});
+
+// 監聽 feed store 的刷新訊號：Navbar 的 UploadDialog 發文成功後會觸發，
+// 這裡重新載入列表，新貼文（依 createdAt 降序）就會出現在最頂端
+watch(() => feedStore.refreshSignal, () => {
   loadPosts(true);
 });
 </script>

@@ -10,6 +10,7 @@ CREATE TABLE post (
   id INT IDENTITY(1,1) PRIMARY KEY,
   member_id INT NOT NULL,
   image_data VARBINARY(MAX) NOT NULL,
+  image_content_type VARCHAR(100),
   description VARCHAR(MAX),
   is_hidden BOOLEAN DEFAULT FALSE,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

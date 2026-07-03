@@ -2,11 +2,13 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
+import { useFeedStore } from '../stores/feed';
 import UploadDialog from './UploadDialog.vue';
 import { useToast } from 'vue-toastification';
 
 const router = useRouter();
 const authStore = useAuthStore();
+const feedStore = useFeedStore();
 const toast = useToast();
 
 const showUpload = ref(false);
@@ -75,8 +77,8 @@ const handleLogout = () => {
       </div>
     </v-container>
 
-    <!-- 上傳照片元件 -->
-    <UploadDialog v-model="showUpload" />
+    <!-- 上傳照片元件：發布成功後透過 feed store 通知 HomeView 重新載入列表 -->
+    <UploadDialog v-model="showUpload" @post-created="feedStore.notifyPostCreated()" />
   </v-app-bar>
 </template>
 

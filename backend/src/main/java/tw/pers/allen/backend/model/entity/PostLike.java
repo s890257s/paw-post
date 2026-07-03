@@ -1,13 +1,16 @@
 package tw.pers.allen.backend.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
-@Data
+// JPA Entity 不使用 @Data，原因詳見 Post.java 的說明
+@Getter
+@Setter
 @NoArgsConstructor
 @Entity
 @Table
