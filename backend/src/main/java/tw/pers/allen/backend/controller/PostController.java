@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import tw.pers.allen.backend.model.dto.PostResponseDto;
 import tw.pers.allen.backend.service.PostService;
-import tw.pers.allen.backend.security.MemberContextHolder;
+import tw.pers.allen.backend.security.LoggedInMemberHolder;
 
 // 處理貼文及按讚相關的 API 請求
 @RestController
@@ -36,7 +36,7 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Integer currentMemberId = MemberContextHolder.getMemberId();
+        Integer currentMemberId = LoggedInMemberHolder.getMemberId();
 
         Page<PostResponseDto> responses = postService.getPosts(pageable, currentMemberId);
         return ResponseEntity.ok(responses);
@@ -48,7 +48,7 @@ public class PostController {
             @RequestParam MultipartFile image,
             @RequestParam(required = false) String description) {
 
-        Integer memberId = MemberContextHolder.requireMemberId();
+        Integer memberId = LoggedInMemberHolder.requireMemberId();
 
         PostResponseDto response = postService.createPost(memberId, image, description);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -57,7 +57,7 @@ public class PostController {
     // 對指定貼文按讚
     @PostMapping("/{id}/likes")
     public ResponseEntity<Void> likePost(@PathVariable Integer id) {
-        Integer memberId = MemberContextHolder.requireMemberId();
+        Integer memberId = LoggedInMemberHolder.requireMemberId();
 
         postService.likePost(memberId, id);
         return ResponseEntity.ok().build();
@@ -66,7 +66,7 @@ public class PostController {
     // 取消對指定貼文的按讚
     @DeleteMapping("/{id}/likes")
     public ResponseEntity<Void> unlikePost(@PathVariable Integer id) {
-        Integer memberId = MemberContextHolder.getMemberId();
+        Integer memberId = LoggedInMemberHolder.getMemberId();
         if (memberId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

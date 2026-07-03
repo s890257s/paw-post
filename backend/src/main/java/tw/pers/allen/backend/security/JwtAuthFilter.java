@@ -32,7 +32,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 // 記錄登入者身分與角色
                 Integer memberId = jwtUtil.getMemberIdFromToken(jwt);
                 String role = jwtUtil.getRoleFromToken(jwt);
-                MemberContextHolder.setContext(memberId, role);
+                LoggedInMemberHolder.setLoggedInMember(memberId, role);
 
                 // 放行請求
                 filterChain.doFilter(request, response);
@@ -50,7 +50,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         } finally {
             // 4. 清理 Context 避免記憶體洩漏與資料污染
-            MemberContextHolder.clear();
+            LoggedInMemberHolder.clear();
         }
     }
 
