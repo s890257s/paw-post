@@ -45,6 +45,7 @@
 | `id` | INT | 唯一識別碼 | 主鍵, Auto Increment |
 | `username` | VARCHAR | 登入帳號 | 唯一值 |
 | `password` | VARCHAR | 登入密碼 |  |
+| `role` | VARCHAR | 使用者角色 | 預設 'USER', 管理員為 'ADMIN' |
 | `created_at`| DATETIME | 建立時間 | 預設當前時間 |
 
 ### 2. post 貼文表
@@ -56,6 +57,7 @@
 | `member_id` | INT | 發布者 | 外鍵 |
 | `image_data` | BLOB | 圖片二進位資料 | 後端存為 byte[] |
 | `description`| TEXT | 文字描述 | 允許空白 |
+| `is_hidden` | BOOLEAN | 是否被禁用 | 預設 FALSE |
 | `created_at`| DATETIME | 發布時間 | 預設當前時間 |
 
 ### 3. post_like 按讚記錄表
@@ -89,10 +91,12 @@
   }
   ```
 - **Response**: `200 OK` 成功 / `401 Unauthorized` 失敗
-  成功時回傳 Token：
+  成功時回傳 Token 以及是否為管理員：
   ```json
   {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "username": "user123",
+    "isAdmin": true
   }
   ```
 
@@ -104,6 +108,7 @@
   - 帶有 Token 則計算 isLiked 狀態，未帶 Token 則 isLiked 一律為 false。
   - 貼文預設依 createdAt 降序排列。
   - isLiked 用於標示當前發出請求的登入者是否已對此貼文按過讚。
+  - **【重要】**若文章已被管理員禁用 (isHidden=true)，且當前請求者不是管理員，則 `imageBase64` 與 `description` 會被清空 (null)。
 - **Query Parameters**:
   - `page`: 頁碼，從 0 開始，預設 0
   - `size`: 每頁筆數，預設 10
@@ -119,7 +124,8 @@
         "description": "可愛的狗狗",
         "createdAt": "2026-06-30T10:00:00",
         "likeCount": 5,
-        "isLiked": false
+        "isLiked": false,
+        "isHidden": false
       }
     ],
     "pageable": {
@@ -158,4 +164,16 @@
 - **方法**: `DELETE`
 - **路徑**: `/api/posts/{id}/likes`
 - **權限**: 需登入
+- **Response**: `200 OK`
+
+### 6. 禁用文章 (隱藏)
+- **方法**: `PUT`
+- **路徑**: `/api/admin/posts/{id}/hide`
+- **權限**: 僅限管理員 (ADMIN)
+- **Response**: `200 OK`
+
+### 7. 解除禁用文章
+- **方法**: `PUT`
+- **路徑**: `/api/admin/posts/{id}/unhide`
+- **權限**: 僅限管理員 (ADMIN)
 - **Response**: `200 OK`

@@ -35,6 +35,16 @@ const handleLogout = () => {
       <!-- 導覽按鈕 -->
       <div v-if="authStore.token">
         <v-btn 
+          v-if="authStore.user?.isAdmin"
+          color="secondary" 
+          variant="flat" 
+          class="mr-2 text-none"
+          prepend-icon="mdi-shield-account"
+          @click="router.push('/admin')"
+        >
+          管理員後台
+        </v-btn>
+        <v-btn 
           color="primary" 
           variant="flat" 
           class="mr-2 text-none"

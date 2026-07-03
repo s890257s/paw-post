@@ -25,3 +25,13 @@ export const likePost = (postId) => {
 export const unlikePost = (postId) => {
     return request.delete(`/posts/${postId}/likes`);
 };
+
+// 隱藏貼文 (管理員)
+export const hidePost = (postId) => {
+    return request.put(`/admin/posts/${postId}/hide`);
+};
+
+// 解除隱藏貼文 (管理員)
+export const unhidePost = (postId) => {
+    return request.put(`/admin/posts/${postId}/unhide`);
+};

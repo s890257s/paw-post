@@ -17,6 +17,8 @@ import tw.pers.allen.backend.model.dto.PostResponseDto;
 import tw.pers.allen.backend.model.entity.Member;
 import tw.pers.allen.backend.model.entity.Post;
 import tw.pers.allen.backend.model.entity.PostLike;
+import tw.pers.allen.backend.security.MemberContextHolder;
+import tw.pers.allen.backend.model.entity.PostLike;
 import tw.pers.allen.backend.repository.MemberRepository;
 import tw.pers.allen.backend.repository.PostLikeRepository;
 import tw.pers.allen.backend.repository.PostRepository;
@@ -58,6 +60,15 @@ public class PostService {
                 isLiked = postLikeRepository.existsByMemberIdAndPostId(currentMemberId, post.getId());
             }
             dto.setIsLiked(isLiked);
+
+            boolean isHidden = Boolean.TRUE.equals(post.getIsHidden());
+            dto.setIsHidden(isHidden);
+
+            // 若文章被隱藏，且目前使用者不是管理員，則遮蔽圖片與描述
+            if (isHidden && !MemberContextHolder.isAdmin()) {
+                dto.setImageBase64(null);
+                dto.setDescription(null);
+            }
 
             return dto;
         }).collect(Collectors.toList());
@@ -122,5 +133,19 @@ public class PostService {
         if (postLike != null) {
             postLikeRepository.delete(postLike);
         }
+    }
+
+    // 切換貼文的隱藏狀態 (僅限管理員)
+    @Transactional
+    public void togglePostHidden(Integer postId, boolean hidden) {
+        if (!MemberContextHolder.isAdmin()) {
+            throw new tw.pers.allen.backend.core.exception.UnauthorizedException("權限不足，僅限管理員操作。");
+        }
+        
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("找不到貼文"));
+        
+        post.setIsHidden(hidden);
+        postRepository.save(post);
     }
 }

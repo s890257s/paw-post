@@ -29,9 +29,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             boolean hasValidToken = Strings.isNotBlank(jwt) && jwtUtil.validateToken(jwt);
 
             if (hasValidToken) {
-                // 記錄登入者身分
+                // 記錄登入者身分與角色
                 Integer memberId = jwtUtil.getMemberIdFromToken(jwt);
-                MemberContextHolder.setMemberId(memberId);
+                String role = jwtUtil.getRoleFromToken(jwt);
+                MemberContextHolder.setContext(memberId, role);
 
                 // 放行請求
                 filterChain.doFilter(request, response);
@@ -84,6 +85,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         // 發布貼文與按讚相關 API 必須驗證身分
         if (path.startsWith("/api/posts")) {
+            return true;
+        }
+
+        // 後台管理 API 必須驗證身分
+        if (path.startsWith("/api/admin")) {
             return true;
         }
 

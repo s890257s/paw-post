@@ -1,10 +1,10 @@
 -- 會員
-INSERT INTO member (username, password) VALUES
-('Alice', '$2a$10$XnH32heSv/TzbU9P.IMk7.sZi7pdYFVw4CpPV0JB7nF6r3kYnHkZG'),
-('Bob', '$2a$10$XnH32heSv/TzbU9P.IMk7.sZi7pdYFVw4CpPV0JB7nF6r3kYnHkZG'),
-('Charlie', '$2a$10$XnH32heSv/TzbU9P.IMk7.sZi7pdYFVw4CpPV0JB7nF6r3kYnHkZG'),
-('David', '$2a$10$XnH32heSv/TzbU9P.IMk7.sZi7pdYFVw4CpPV0JB7nF6r3kYnHkZG'),
-('Eve', '$2a$10$XnH32heSv/TzbU9P.IMk7.sZi7pdYFVw4CpPV0JB7nF6r3kYnHkZG');
+INSERT INTO member (username, password, role) VALUES
+('Alice', '$2a$10$XnH32heSv/TzbU9P.IMk7.sZi7pdYFVw4CpPV0JB7nF6r3kYnHkZG', 'ADMIN'),
+('Bob', '$2a$10$XnH32heSv/TzbU9P.IMk7.sZi7pdYFVw4CpPV0JB7nF6r3kYnHkZG', 'USER'),
+('Charlie', '$2a$10$XnH32heSv/TzbU9P.IMk7.sZi7pdYFVw4CpPV0JB7nF6r3kYnHkZG', 'USER'),
+('David', '$2a$10$XnH32heSv/TzbU9P.IMk7.sZi7pdYFVw4CpPV0JB7nF6r3kYnHkZG', 'USER'),
+('Eve', '$2a$10$XnH32heSv/TzbU9P.IMk7.sZi7pdYFVw4CpPV0JB7nF6r3kYnHkZG', 'USER');
 
 -- 貼文
 INSERT INTO post (member_id, image_data, description) VALUES

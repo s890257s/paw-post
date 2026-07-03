@@ -30,9 +30,10 @@ public class JwtUtil {
     /**
      * 產生 JWT
      */
-    public String generateToken(Integer memberId) {
+    public String generateToken(Integer memberId, String role) {
         return Jwts.builder() // 使用 builder 模式設定 token
                 .subject(String.valueOf(memberId)) // 設定 Subject，通常放 memberId
+                .claim("role", role) // 存入角色
                 .issuedAt(new Date()) // 設定發行時間
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION)) // 設定到期時間
                 .signWith(SECRET_KEY) // 使用私鑰簽名
@@ -55,6 +56,13 @@ public class JwtUtil {
      */
     public Integer getMemberIdFromToken(String token) {
         return Integer.valueOf(getClaims(token).getSubject());
+    }
+
+    /**
+     * 解析 token 並取得 role
+     */
+    public String getRoleFromToken(String token) {
+        return getClaims(token).get("role", String.class);
     }
 
     /**

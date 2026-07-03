@@ -1,16 +1,10 @@
 <script setup>
-import Navbar from './components/Navbar.vue';
+// 應用程式根元件，只負責掛載 v-app 與 router-view
 </script>
 
 <template>
   <v-app>
-    <!-- 頂部導覽列 -->
-    <Navbar />
-
-    <!-- 頁面主要內容區域 -->
-    <v-main class="bg-grey-lighten-4">
-      <router-view />
-    </v-main>
+    <router-view />
   </v-app>
 </template>
 

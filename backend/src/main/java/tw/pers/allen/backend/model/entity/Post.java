@@ -28,6 +28,9 @@ public class Post {
     @Column
     private String description;
 
+    @Column(name = "is_hidden")
+    private Boolean isHidden = false;
+
     @CreationTimestamp
     @Column
     private LocalDateTime createdAt;

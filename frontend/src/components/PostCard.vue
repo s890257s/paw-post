@@ -69,8 +69,13 @@ const handleLike = async () => {
       </v-card-subtitle>
     </v-card-item>
 
-    <!-- 照片展示 -->
+    <!-- 照片展示 或 禁用提示 -->
+    <div v-if="post.isHidden" class="bg-grey-lighten-3 d-flex align-center justify-center flex-column" style="height: 400px;">
+      <v-icon icon="mdi-shield-off-outline" size="64" color="grey-darken-1" class="mb-2"></v-icon>
+      <span class="text-h6 text-grey-darken-1 font-weight-bold">此文章已被管理員禁用</span>
+    </div>
     <v-img
+      v-else
       :src="imageSrc"
       height="400"
       cover
@@ -84,7 +89,7 @@ const handleLike = async () => {
     </v-img>
 
     <!-- 互動按鈕 -->
-    <v-card-actions class="px-4 pt-2 pb-0">
+    <v-card-actions class="px-4 pt-2 pb-0" v-if="!post.isHidden">
       <v-btn
         icon
         variant="text"
@@ -97,7 +102,7 @@ const handleLike = async () => {
     </v-card-actions>
 
     <!-- 文字描述 -->
-    <v-card-text class="pt-2 px-4 pb-4 text-body-1" v-if="post.description">
+    <v-card-text class="pt-2 px-4 pb-4 text-body-1" v-if="!post.isHidden && post.description">
       <span class="font-weight-bold mr-2">{{ post.username }}</span>
       <span class="text-grey-darken-3">{{ post.description }}</span>
     </v-card-text>

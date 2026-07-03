@@ -24,9 +24,10 @@ export const useAuthStore = defineStore(
             // 將後端回傳的 token 存入 state
             token.value = response.data.token;
 
-            // 儲存後端回傳的 username
+            // 儲存後端回傳的 username 與 isAdmin
             user.value = {
-                username: response.data.username
+                username: response.data.username,
+                isAdmin: response.data.isAdmin || false
             };
         };
 

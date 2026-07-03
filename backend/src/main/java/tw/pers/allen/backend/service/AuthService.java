@@ -32,7 +32,8 @@ public class AuthService {
             throw new UnauthorizedException("帳號或密碼錯誤。");
         }
 
-        String token = jwtUtil.generateToken(member.getId());
-        return new LoginResponseDto(token, member.getUsername());
+        String token = jwtUtil.generateToken(member.getId(), member.getRole());
+        boolean isAdmin = "ADMIN".equals(member.getRole());
+        return new LoginResponseDto(token, member.getUsername(), isAdmin);
     }
 }

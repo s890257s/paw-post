@@ -23,6 +23,9 @@ public class Member {
     @Column
     private String password;
 
+    @Column
+    private String role;
+
     @CreationTimestamp
     @Column
     private LocalDateTime createdAt;

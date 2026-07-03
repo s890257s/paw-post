@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 public class LoginResponseDto {
     private String token;
     private String username;
+    private Boolean isAdmin;
 }

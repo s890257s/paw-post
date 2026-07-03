@@ -16,4 +16,5 @@ public class PostResponseDto {
     private LocalDateTime createdAt;
     private Integer likeCount;
     private Boolean isLiked;
+    private Boolean isHidden;
 }
