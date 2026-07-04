@@ -76,8 +76,6 @@ public class PostController {
     // 取消對指定貼文的按讚
     @DeleteMapping("/{id}/likes")
     public ResponseEntity<Void> unlikePost(@PathVariable Integer id) {
-        // JwtAuthFilter 已擋下未登入的請求，這裡的 requireMemberId 是第二道保險，
-        // 同時也讓程式碼明確表達「此操作必須登入」的意圖
         Integer memberId = LoggedInMemberHolder.requireMemberId();
 
         postService.unlikePost(memberId, id);
