@@ -1,4 +1,4 @@
-import request from './request';
+import request from '@/api/request';
 
 // 使用者登入
 // API 呼叫統一放在 api/ 資料夾，store 只負責管理狀態（分層職責）

@@ -11,7 +11,7 @@
 <style>
 /* 全域樣式設定 */
 body {
-  font-family: 'Inter', 'Roboto', sans-serif;
+  font-family: 'Roboto', sans-serif;
   margin: 0;
   padding: 0;
 }

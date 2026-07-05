@@ -1,4 +1,4 @@
-import request from './request';
+import request from '@/api/request';
 
 // 取得貼文列表
 export const getPosts = (page = 0, size = 10) => {

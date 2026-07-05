@@ -1,30 +1,27 @@
 <script setup>
 import { ref, watch } from 'vue';
-import { compressImage } from '../utils/image';
-import { createPost } from '../api/post';
+import { compressImage } from '@/utils/image';
+import { createPost } from '@/api/post';
 import { useToast } from 'vue-toastification';
 
-const props = defineProps({
-  modelValue: Boolean
-});
+// defineModel (Vue 3.4+)：讓父元件的 v-model 直接對應這個 ref，
+// 讀寫 dialog 就等於讀寫父層傳入的值，不必再手動宣告 props + emit 同步
+const dialog = defineModel({ type: Boolean });
 
-const emit = defineEmits(['update:modelValue', 'post-created']);
+const emit = defineEmits(['post-created']);
 
 const toast = useToast();
 
-const dialog = ref(false);
 const isUploading = ref(false);
 const description = ref('');
 const selectedFile = ref(null);
 const previewUrl = ref('');
 
-// 同步外部的 v-model
-watch(() => props.modelValue, (newVal) => {
-  dialog.value = newVal;
-});
+// 綁定 template 裡的 <input type="file">（對應 ref="fileInput" 屬性）
+const fileInput = ref(null);
 
+// 對話框關閉時清空表單
 watch(dialog, (newVal) => {
-  emit('update:modelValue', newVal);
   if (!newVal) {
     resetForm();
   }
@@ -70,9 +67,11 @@ const submitPost = async () => {
     // 壓縮圖片
     const compressedBlob = await compressImage(selectedFile.value, 1200, 0.8);
     
-    // 準備 FormData
+    // 準備 FormData。壓縮輸出固定是 JPEG，
+    // 檔名的副檔名也換成 .jpg（例如 cat.png → cat.jpg），避免名實不符
+    const fileName = selectedFile.value.name.replace(/\.\w+$/, '') + '.jpg';
     const formData = new FormData();
-    formData.append('image', compressedBlob, selectedFile.value.name);
+    formData.append('image', compressedBlob, fileName);
     formData.append('description', description.value);
 
     // 發送請求
@@ -102,7 +101,7 @@ const submitPost = async () => {
         <!-- 圖片上傳區塊 -->
         <div 
           class="upload-area mb-4 rounded-lg d-flex flex-column align-center justify-center bg-grey-lighten-4 border-dashed"
-          @click="$refs.fileInput.click()"
+          @click="fileInput.click()"
         >
           <template v-if="!previewUrl">
             <v-icon icon="mdi-cloud-upload-outline" size="48" color="grey"></v-icon>

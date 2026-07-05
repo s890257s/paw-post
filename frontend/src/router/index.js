@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import UserLayout from '../layouts/UserLayout.vue'
-import AdminLayout from '../layouts/AdminLayout.vue'
-import { useAuthStore } from '../stores/auth'
+// 「@」是 src 資料夾的別名（設定見 vite.config.js 與 jsconfig.json），
+// 專案內的 import 統一使用 @，路徑不會因檔案搬移而跟著改
+import UserLayout from '@/layouts/UserLayout.vue'
+import AdminLayout from '@/layouts/AdminLayout.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,12 +15,12 @@ const router = createRouter({
         {
           path: '',
           name: 'home',
-          component: () => import('../views/HomeView.vue')
+          component: () => import('@/views/HomeView.vue')
         },
         {
           path: 'login',
           name: 'login',
-          component: () => import('../views/LoginView.vue')
+          component: () => import('@/views/LoginView.vue')
         }
       ]
     },
@@ -31,7 +33,7 @@ const router = createRouter({
         {
           path: '',
           name: 'admin-home',
-          component: () => import('../views/admin/AdminHomeView.vue')
+          component: () => import('@/views/admin/AdminHomeView.vue')
         }
       ]
     },

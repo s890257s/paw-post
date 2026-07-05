@@ -1,6 +1,6 @@
 // 建立 app
 import { createApp } from 'vue'
-import App from './App.vue'
+import App from '@/App.vue'
 const app = createApp(App)
 
 // pinia
@@ -12,10 +12,12 @@ pinia.use(piniaPluginPersistedstate)
 app.use(pinia)
 
 // router
-import router from './router'
+import router from '@/router'
 app.use(router)
 
 // vuetify
+// 這裡「全量載入」所有元件是教學上的簡化，程式好懂但 bundle 較大；
+// 實務會改用 vite-plugin-vuetify 自動按需引入（只打包有用到的元件）
 import "@mdi/font/css/materialdesignicons.css";
 import "vuetify/styles";
 import { createVuetify } from "vuetify";

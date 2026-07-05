@@ -1,9 +1,9 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../stores/auth';
-import { useFeedStore } from '../stores/feed';
-import UploadDialog from './UploadDialog.vue';
+import { useAuthStore } from '@/stores/auth';
+import { useFeedStore } from '@/stores/feed';
+import UploadDialog from '@/components/UploadDialog.vue';
 import { useToast } from 'vue-toastification';
 
 const router = useRouter();

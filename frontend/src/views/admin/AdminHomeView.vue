@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { getAdminPosts, hidePost, unhidePost } from '../../api/post';
+import { getAdminPosts, hidePost, unhidePost } from '@/api/post';
 import { useToast } from 'vue-toastification';
 
 const posts = ref([]);

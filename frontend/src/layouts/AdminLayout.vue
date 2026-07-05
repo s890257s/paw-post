@@ -6,7 +6,7 @@ const drawer = ref(true);
 
 <template>
   <!-- 後台側邊導覽列 -->
-  <v-navigation-drawer v-model="drawer" app color="grey-darken-4" theme="dark">
+  <v-navigation-drawer v-model="drawer" color="grey-darken-4" theme="dark">
     <v-list>
       <v-list-item title="Paw Post Admin" subtitle="後台管理系統"></v-list-item>
       <v-divider></v-divider>
@@ -18,7 +18,7 @@ const drawer = ref(true);
   </v-navigation-drawer>
 
   <!-- 後台上方的 App Bar -->
-  <v-app-bar app color="white" elevation="1">
+  <v-app-bar color="white" elevation="1">
     <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
     <v-app-bar-title>管理員儀表板</v-app-bar-title>
   </v-app-bar>

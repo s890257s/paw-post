@@ -2,8 +2,8 @@
 // defineProps / defineEmits 是編譯器巨集 (compiler macro)，不需要 import，
 // import 反而會在 console 產生警告
 import { ref, computed } from 'vue';
-import { useAuthStore } from '../stores/auth';
-import { likePost, unlikePost } from '../api/post';
+import { useAuthStore } from '@/stores/auth';
+import { likePost, unlikePost } from '@/api/post';
 import { useToast } from 'vue-toastification';
 
 const props = defineProps({
@@ -17,9 +17,8 @@ const emit = defineEmits(['update-post']);
 const authStore = useAuthStore();
 const toast = useToast();
 
-const isLiked = computed(() => props.post.isLiked);
-const likeCount = computed(() => props.post.likeCount);
-const imageSrc = computed(() => props.post.imageBase64);
+// props 的欄位可以直接使用（如 template 裡的 post.username），
+// 只有「需要加工」的資料才值得包成 computed，例如下面兩個：
 
 // 被禁用的文章是否要對「目前的觀看者」遮罩：
 // 後端對管理員不清空內容（方便判斷該不該解禁），所以管理員照常顯示、只加標記
@@ -51,12 +50,12 @@ const handleLike = async () => {
   isProcessing.value = true;
 
   try {
-    if (isLiked.value) {
+    if (props.post.isLiked) {
       await unlikePost(props.post.id);
-      emit('update-post', { ...props.post, isLiked: false, likeCount: likeCount.value - 1 });
+      emit('update-post', { ...props.post, isLiked: false, likeCount: props.post.likeCount - 1 });
     } else {
       await likePost(props.post.id);
-      emit('update-post', { ...props.post, isLiked: true, likeCount: likeCount.value + 1 });
+      emit('update-post', { ...props.post, isLiked: true, likeCount: props.post.likeCount + 1 });
     }
   } catch (error) {
     console.error('按讚操作失敗', error);
@@ -90,7 +89,7 @@ const handleLike = async () => {
     </div>
     <v-img
       v-else
-      :src="imageSrc"
+      :src="post.imageBase64"
       height="400"
       cover
       class="bg-grey-lighten-2"
@@ -118,12 +117,12 @@ const handleLike = async () => {
       <v-btn
         icon
         variant="text"
-        :color="isLiked ? 'red' : 'grey-darken-1'"
+        :color="post.isLiked ? 'red' : 'grey-darken-1'"
         @click="handleLike"
       >
-        <v-icon :icon="isLiked ? 'mdi-heart' : 'mdi-heart-outline'" size="x-large"></v-icon>
+        <v-icon :icon="post.isLiked ? 'mdi-heart' : 'mdi-heart-outline'" size="x-large"></v-icon>
       </v-btn>
-      <span class="text-subtitle-2 font-weight-bold ml-1">{{ likeCount }} 個讚</span>
+      <span class="text-subtitle-2 font-weight-bold ml-1">{{ post.likeCount }} 個讚</span>
     </v-card-actions>
 
     <!-- 文字描述 -->
