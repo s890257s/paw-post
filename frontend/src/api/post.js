@@ -23,6 +23,13 @@ export const unlikePost = (postId) => {
     return request.delete(`/posts/${postId}/likes`);
 };
 
+// 取得後台貼文列表 (管理員)：回傳不含圖片的摘要資料
+export const getAdminPosts = (page = 0, size = 20) => {
+    return request.get('/admin/posts', {
+        params: { page, size }
+    });
+};
+
 // 隱藏貼文 (管理員)
 export const hidePost = (postId) => {
     return request.put(`/admin/posts/${postId}/hide`);

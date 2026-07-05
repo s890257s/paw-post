@@ -227,6 +227,34 @@ npm run dev
 - **權限**: 僅限管理員 (ADMIN)
 - **Response**: `200 OK`；已登入但非管理員回 `403 Forbidden`
 
+### 8. 後台貼文列表（摘要）
+- **方法**: `GET`
+- **路徑**: `/api/admin/posts?page=0&size=20`
+- **權限**: 僅限管理員 (ADMIN)
+- **說明**: 供後台管理表格使用，**刻意不含 `imageBase64`**。
+  教學點：API 只回傳「剛好夠用」的資料——後台表格只顯示文字，
+  沿用含圖片的貼文列表 API 會讓管理頁面下載大量用不到的圖片。
+- **Query Parameters**:
+  - `page`: 頁碼，從 0 開始，預設 0
+  - `size`: 每頁筆數，預設 20
+- **Response**: 遵循 Spring Data JPA Page 格式
+  ```json
+  {
+    "content": [
+      {
+        "id": 1,
+        "username": "user123",
+        "description": "可愛的狗狗",
+        "createdAt": "2026-06-30T10:00:00",
+        "likeCount": 5,
+        "isHidden": false
+      }
+    ],
+    "totalElements": 50,
+    "totalPages": 3
+  }
+  ```
+
 ---
 
 ## 專案教學與求職面試評估分析

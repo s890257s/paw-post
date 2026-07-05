@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import tw.pers.allen.backend.core.exception.BadRequestException;
 import tw.pers.allen.backend.core.exception.ForbiddenException;
 import tw.pers.allen.backend.core.exception.NotFoundException;
+import tw.pers.allen.backend.model.dto.AdminPostSummaryDto;
 import tw.pers.allen.backend.model.dto.PostResponseDto;
 import tw.pers.allen.backend.model.entity.Member;
 import tw.pers.allen.backend.model.entity.Post;
@@ -91,6 +92,26 @@ public class PostService {
             dto.setImageBase64(toDataUri(post));
         }
 
+        return dto;
+    }
+
+    // 取得後台管理用的貼文摘要列表（不含圖片，理由見 AdminPostSummaryDto 的說明）
+    @Transactional(readOnly = true)
+    public Page<AdminPostSummaryDto> getAdminPosts(Pageable pageable) {
+        Page<Post> postPage = postRepository.findAll(pageable);
+        return postPage.map(this::toAdminSummaryDto);
+    }
+
+    // 注意：這裡同樣有 getMember()、countByPostId 的 N+1 查詢，
+    // 與上方 toDto 是同一個刻意保留的效能反面教材，解法方向見該處註解。
+    private AdminPostSummaryDto toAdminSummaryDto(Post post) {
+        AdminPostSummaryDto dto = new AdminPostSummaryDto();
+        dto.setId(post.getId());
+        dto.setUsername(post.getMember().getUsername());
+        dto.setDescription(post.getDescription());
+        dto.setCreatedAt(post.getCreatedAt());
+        dto.setLikeCount(postLikeRepository.countByPostId(post.getId()));
+        dto.setIsHidden(Boolean.TRUE.equals(post.getIsHidden()));
         return dto;
     }
 

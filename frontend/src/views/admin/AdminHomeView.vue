@@ -1,18 +1,23 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { getPosts, hidePost, unhidePost } from '../../api/post';
+import { ref, onMounted, watch } from 'vue';
+import { getAdminPosts, hidePost, unhidePost } from '../../api/post';
 import { useToast } from 'vue-toastification';
 
 const posts = ref([]);
 const toast = useToast();
 const isLoading = ref(false);
 
+// v-pagination 的頁碼從 1 開始，呼叫 API 時再換算成從 0 開始
+const page = ref(1);
+const totalPages = ref(0);
+
 const loadPosts = async () => {
   isLoading.value = true;
   try {
-    // 管理員後台簡單展示，一次抓 100 筆
-    const response = await getPosts(0, 100);
+    // 後台用「摘要」API：不含圖片資料，避免下載整頁用不到的 Base64 圖
+    const response = await getAdminPosts(page.value - 1, 20);
     posts.value = response.data.content;
+    totalPages.value = response.data.totalPages;
   } catch (error) {
     // HTTP 錯誤的 toast 統一由 request.js 的回應攔截器發出，
     // 這裡再 toast 一次會讓同一個錯誤跳出兩則訊息
@@ -41,6 +46,11 @@ const handleToggleHide = async (post) => {
 onMounted(() => {
   loadPosts();
 });
+
+// 換頁時重新載入
+watch(page, () => {
+  loadPosts();
+});
 </script>
 
 <template>
@@ -54,13 +64,14 @@ onMounted(() => {
             <th class="text-left" width="80">ID</th>
             <th class="text-left" width="120">發布者</th>
             <th class="text-left">內容預覽</th>
+            <th class="text-left" width="80">讚數</th>
             <th class="text-left" width="100">狀態</th>
             <th class="text-center" width="150">操作</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="posts.length === 0 && !isLoading">
-            <td colspan="5" class="text-center text-grey py-4">目前沒有任何文章</td>
+            <td colspan="6" class="text-center text-grey py-4">目前沒有任何文章</td>
           </tr>
           <tr v-for="post in posts" :key="post.id">
             <td>{{ post.id }}</td>
@@ -68,6 +79,7 @@ onMounted(() => {
             <td class="text-truncate" style="max-width: 300px;">
               {{ post.description || '(無文字內容)' }}
             </td>
+            <td>{{ post.likeCount }}</td>
             <td>
               <v-chip :color="post.isHidden ? 'red' : 'success'" size="small" variant="flat">
                 {{ post.isHidden ? '已禁用' : '正常' }}
@@ -86,6 +98,15 @@ onMounted(() => {
           </tr>
         </tbody>
       </v-table>
+
+      <!-- 分頁控制：只有一頁時不顯示 -->
+      <v-pagination
+        v-if="totalPages > 1"
+        v-model="page"
+        :length="totalPages"
+        :total-visible="7"
+        class="my-4"
+      ></v-pagination>
     </v-card>
   </div>
 </template>
