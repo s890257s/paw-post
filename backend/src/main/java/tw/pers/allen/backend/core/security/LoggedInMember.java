@@ -1,4 +1,4 @@
-package tw.pers.allen.backend.security;
+package tw.pers.allen.backend.core.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

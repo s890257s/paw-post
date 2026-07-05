@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
+import tw.pers.allen.backend.core.security.LoggedInMemberHolder;
 import tw.pers.allen.backend.model.dto.PostResponseDto;
-import tw.pers.allen.backend.security.LoggedInMemberHolder;
 import tw.pers.allen.backend.service.PostService;
 
 // 處理貼文及按讚相關的 API 請求
@@ -28,6 +28,9 @@ import tw.pers.allen.backend.service.PostService;
 @RequiredArgsConstructor
 public class PostController {
 
+    // 單頁筆數上限，防止一次撈取過量資料
+    private static final int MAX_PAGE_SIZE = 50;
+
     private final PostService postService;
 
     // 取得貼文列表，支援分頁排序
@@ -36,11 +39,18 @@ public class PostController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
+        // 【參數防禦】這是「免登入」的重查詢 API（回應含整頁圖片的 Base64）：
+        // - size 不設上限，任何人都能用 size=10000 打出一發極重的查詢
+        // - page/size 為負數會讓 PageRequest.of 直接拋例外，變成 500
+        // 這裡採「靜默修正」(clamp)，與多數公開 API（如 GitHub）的慣例一致
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
+
         // 依規格：貼文固定以 createdAt 降序排列（最新的在最前面）。
         // 再以 id 降序當第二排序鍵：種子資料是同一批寫入的，createdAt 完全相同，
         // 若沒有第二排序鍵，相同時間的貼文順序就不穩定
         Sort sort = Sort.by("createdAt").descending().and(Sort.by("id").descending());
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Pageable pageable = PageRequest.of(safePage, safeSize, sort);
 
         // 未登入時 memberId 為 null，isLiked 一律為 false
         Integer currentMemberId = LoggedInMemberHolder.getMemberId();

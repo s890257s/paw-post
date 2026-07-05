@@ -25,11 +25,13 @@ const handleLogout = () => {
     <v-container class="d-flex align-center px-4" fluid>
       <!-- Logo 區塊 -->
       <v-toolbar-title 
-        class="font-weight-bold text-primary cursor-pointer d-flex align-center"
+        class="font-weight-bold text-primary cursor-pointer"
         @click="router.push('/')"
       >
-        <v-icon icon="mdi-paw" class="mr-2" color="primary"></v-icon>
-        Paw Post
+        <div class="d-flex align-center">
+          <img src="/favicon.ico" alt="Paw Post Logo" class="mr-2" width="24" height="24" />
+          <span>Paw Post</span>
+        </div>
       </v-toolbar-title>
 
       <v-spacer></v-spacer>

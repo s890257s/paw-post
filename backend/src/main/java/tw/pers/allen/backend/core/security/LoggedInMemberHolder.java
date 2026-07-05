@@ -1,5 +1,6 @@
-package tw.pers.allen.backend.security;
+package tw.pers.allen.backend.core.security;
 
+import tw.pers.allen.backend.core.exception.ForbiddenException;
 import tw.pers.allen.backend.core.exception.UnauthorizedException;
 
 // 以 ThreadLocal 保存「當前請求」的登入者身分。
@@ -36,7 +37,15 @@ public class LoggedInMemberHolder {
 
     public static boolean isAdmin() {
         LoggedInMember member = memberHolder.get();
-        return member != null && "ADMIN".equals(member.getRole());
+        return member != null && Role.ADMIN.name().equals(member.getRole());
+    }
+
+    // 已登入但不是管理員 -> 403 Forbidden（不是 401，因為身分是明確的，只是權限不足）
+    // 訊息不重複寫狀態碼——狀態碼由 HTTP status 表達，寫兩份將來會不一致
+    public static void requireAdmin() {
+        if (!isAdmin()) {
+            throw new ForbiddenException("權限不足，僅限管理員操作。");
+        }
     }
 
     public static void clear() {

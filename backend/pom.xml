@@ -85,11 +85,12 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<!-- BCrypt -->
+		<!-- 密碼雜湊 BCrypt。
+		     只引入 crypto 這一個模組（版本由 Spring Boot 統一管理），
+		     不是整套 Spring Security，不會影響本專案手寫的 JWT Filter 架構 -->
 		<dependency>
-			<groupId>org.mindrot</groupId>
-			<artifactId>jbcrypt</artifactId>
-			<version>0.4</version>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-crypto</artifactId>
 		</dependency>
 	</dependencies>
 

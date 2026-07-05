@@ -8,12 +8,11 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
-// JPA Entity 不使用 @Data，原因詳見 Post.java 的說明
+// JPA Entity 不使用 @Data、不逐欄寫 @Column，原因詳見 Post.java 的說明
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
-@Table
 public class PostLike {
 
     @Id
@@ -21,14 +20,11 @@ public class PostLike {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
     private Post post;
 
     @CreationTimestamp
-    @Column
     private LocalDateTime createdAt;
 }

@@ -1,4 +1,4 @@
-package tw.pers.allen.backend.security;
+package tw.pers.allen.backend.core.security;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -14,18 +14,24 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtUtil {
 
-    // 密鑰。根據長度不同，JJWT 會自動決定最安全的 HMAC-SHA 實作：
+    // 【安全警告：正式專案的密鑰絕不可硬編碼在原始碼中！】
+    // 進了版控 (git) 的密鑰等同洩漏——即使之後刪掉，它仍留在 git 歷史裡。
+    // 本教學專案為了讓大家 clone 下來即可執行，「刻意」將密鑰寫死在這裡；
+    // 正式專案必須改由設定注入（application.properties + @Value），
+    // 再透過環境變數或密鑰管理服務（如 Vault、AWS Secrets Manager）提供實際值。
+    //
+    // 密鑰長度決定 JJWT 自動選用的 HMAC-SHA 實作：
     // - 32 ~ 47 bytes (256+ bits) : HS256
     // - 48 ~ 63 bytes (384+ bits) : HS384
     // - 64 bytes 以上 (512+ bits) : HS512
     // 註：此密鑰長度為 63 bytes，因此底層實際使用的是 HS384 演算法
-    private final String JWT_SECRET = "this_is_a_super_long_secret_key_and_do_not_share_it_with_anyone";
+    private static final String JWT_SECRET = "this_is_a_super_long_secret_key_and_do_not_share_it_with_anyone";
 
     // 使用 HMAC-SHA 演算法簽章
-    private final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
+    private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
 
     // Token 有效期設定為 24 小時
-    private final long EXPIRATION = 60 * 60 * 24 * 1000;
+    private static final long EXPIRATION = 60 * 60 * 24 * 1000;
 
     /**
      * 產生 JWT
