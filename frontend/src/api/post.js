@@ -8,14 +8,9 @@ export const getPosts = (page = 0, size = 10) => {
 };
 
 // 發布新照片
-// 因為 request.js 全域設定了 application/json，這裡需要特別覆寫成 multipart/form-data
-// (現代版本的 Axios 會自動補上 boundary)
+// 不需要指定 Content-Type：axios 看到 FormData 會自動設為 multipart/form-data 並補上 boundary
 export const createPost = (formData) => {
-    return request.post('/posts', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    });
+    return request.post('/posts', formData);
 };
 
 // 對照片按讚

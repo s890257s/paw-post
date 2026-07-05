@@ -1,14 +1,15 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-// 如果有登入用的獨立 api 方法可以放這裡，或是直接使用共用的 request
-import request from '@/api/request';
+// HTTP 呼叫統一放在 api/ 層，store 只負責「狀態」：
+// 為了避免和下方的 action 同名，import 時取別名 loginApi
+import { login as loginApi } from '@/api/auth';
 
 export const useAuthStore = defineStore(
     'auth',
     () => {
         // State
         const token = ref('');
-        const user = ref(null); // 預留給未來存放使用者名稱或 ID 的欄位
+        const user = ref(null); // 登入後存放 { username, isAdmin }
 
         // Actions
         /**
@@ -16,9 +17,7 @@ export const useAuthStore = defineStore(
          * @param {Object} loginRequest 包含帳號密碼的物件
          */
         const login = async (loginRequest) => {
-            // 使用共用的 request 打 API，或者直接用 axios。
-            // 由於登入不需要帶 token，用共用的 request 也是沒問題的
-            const response = await request.post('/login', loginRequest);
+            const response = await loginApi(loginRequest);
 
             // 將後端回傳的 token 存入 state
             token.value = response.data.token;

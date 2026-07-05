@@ -33,6 +33,8 @@ npm run dev
 ```
 
 - 開發伺服器位於 `http://localhost:5173`
+- 後端 API 位址設定在 `frontend/.env.development`（`VITE_API_BASE_URL`），
+  部署到其他環境時只需調整設定檔，不用改程式碼
 
 ### 示範帳號
 
