@@ -157,6 +157,7 @@ npm run dev
   - 貼文預設依 createdAt 降序排列。
   - isLiked 用於標示當前發出請求的登入者是否已對此貼文按過讚。
   - **【重要】**若文章已被管理員禁用 (isHidden=true)，且當前請求者不是管理員，則 `imageBase64` 與 `description` 會被清空 (null)。
+    前端據此對一般使用者顯示「已被禁用」遮罩；管理員則照常看到內容，並在圖片上標示「已禁用」，方便判斷是否解除禁用。
   - `imageBase64` 的 data URI 前綴會依圖片實際格式而定（例如 `data:image/webp;base64,...` 或 `data:image/jpeg;base64,...`）。
 - **Query Parameters**:
   - `page`: 頁碼，從 0 開始，預設 0

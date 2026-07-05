@@ -21,6 +21,10 @@ const isLiked = computed(() => props.post.isLiked);
 const likeCount = computed(() => props.post.likeCount);
 const imageSrc = computed(() => props.post.imageBase64);
 
+// 被禁用的文章是否要對「目前的觀看者」遮罩：
+// 後端對管理員不清空內容（方便判斷該不該解禁），所以管理員照常顯示、只加標記
+const isMaskedForViewer = computed(() => props.post.isHidden && !authStore.user?.isAdmin);
+
 // 格式化日期顯示
 const formattedDate = computed(() => {
   if (!props.post.createdAt) return '';
@@ -80,7 +84,7 @@ const handleLike = async () => {
     </v-card-item>
 
     <!-- 照片展示 或 禁用提示 -->
-    <div v-if="post.isHidden" class="bg-grey-lighten-3 d-flex align-center justify-center flex-column" style="height: 400px;">
+    <div v-if="isMaskedForViewer" class="bg-grey-lighten-3 d-flex align-center justify-center flex-column" style="height: 400px;">
       <v-icon icon="mdi-shield-off-outline" size="64" color="grey-darken-1" class="mb-2"></v-icon>
       <span class="text-h6 text-grey-darken-1 font-weight-bold">此文章已被管理員禁用</span>
     </div>
@@ -91,6 +95,17 @@ const handleLike = async () => {
       cover
       class="bg-grey-lighten-2"
     >
+      <!-- 管理員視角：內容照常顯示，但標示禁用狀態 -->
+      <v-chip
+        v-if="post.isHidden"
+        color="red"
+        variant="flat"
+        size="small"
+        class="ma-2"
+        prepend-icon="mdi-shield-off-outline"
+      >
+        已禁用（僅管理員可見）
+      </v-chip>
       <template v-slot:placeholder>
         <v-row class="fill-height ma-0" align="center" justify="center">
           <v-progress-circular indeterminate color="primary"></v-progress-circular>
@@ -112,7 +127,7 @@ const handleLike = async () => {
     </v-card-actions>
 
     <!-- 文字描述 -->
-    <v-card-text class="pt-2 px-4 pb-4 text-body-1" v-if="!post.isHidden && post.description">
+    <v-card-text class="pt-2 px-4 pb-4 text-body-1" v-if="!isMaskedForViewer && post.description">
       <span class="font-weight-bold mr-2">{{ post.username }}</span>
       <span class="text-grey-darken-3">{{ post.description }}</span>
     </v-card-text>
