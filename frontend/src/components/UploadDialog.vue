@@ -46,13 +46,17 @@ const handleFileChange = (event) => {
   }
 
   selectedFile.value = file;
-  
+
   // 產生預覽圖
   const reader = new FileReader();
   reader.onload = (e) => {
     previewUrl.value = e.target.result;
   };
   reader.readAsDataURL(file);
+
+  // 清空 input 的值：change 事件只在「值改變」時觸發，
+  // 若不清空，使用者取消後再選「同一張」圖片會沒有反應
+  event.target.value = '';
 };
 
 const submitPost = async () => {
@@ -91,7 +95,7 @@ const submitPost = async () => {
     <v-card class="rounded-lg">
       <v-card-title class="d-flex justify-space-between align-center pa-4 bg-primary text-white">
         <span class="text-h6 font-weight-bold">建立新貼文</span>
-        <v-btn icon="mdi-close" variant="text" color="white" @click="dialog = false"></v-btn>
+        <v-btn icon="mdi-close" variant="text" color="white" @click="dialog = false" :disabled="isUploading"></v-btn>
       </v-card-title>
       
       <v-card-text class="pa-4">

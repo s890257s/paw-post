@@ -14,7 +14,9 @@ const loadPosts = async () => {
     const response = await getPosts(0, 100);
     posts.value = response.data.content;
   } catch (error) {
-    toast.error('無法取得貼文列表');
+    // HTTP 錯誤的 toast 統一由 request.js 的回應攔截器發出，
+    // 這裡再 toast 一次會讓同一個錯誤跳出兩則訊息
+    console.error('無法取得貼文列表', error);
   } finally {
     isLoading.value = false;
   }
@@ -32,7 +34,7 @@ const handleToggleHide = async (post) => {
       toast.success('已禁用該文章');
     }
   } catch (error) {
-    toast.error('操作失敗，請確認權限');
+    console.error('禁用/解禁操作失敗', error);
   }
 };
 

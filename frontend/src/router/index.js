@@ -34,6 +34,12 @@ const router = createRouter({
           component: () => import('../views/admin/AdminHomeView.vue')
         }
       ]
+    },
+    {
+      // Catch-all 路由：比對不到任何路徑時導回首頁，
+      // 避免使用者輸入錯誤網址看到一片空白
+      path: '/:pathMatch(.*)*',
+      redirect: { name: 'home' }
     }
   ],
 })
@@ -42,11 +48,17 @@ const router = createRouter({
 // 注意：前端守衛只是「使用者體驗」層的防線（避免看到打不開的頁面），
 // 真正的權限防線在後端 API —— 就算有人繞過前端，後端仍會回 401 / 403。
 router.beforeEach((to) => {
+  const authStore = useAuthStore();
+
+  // 已登入者不需要再看到登入頁，直接導回首頁
+  if (to.name === 'login' && authStore.token) {
+    return { name: 'home' };
+  }
+
   // matched 包含巢狀路由的所有層級，只要其中一層要求管理員就需要檢查
   const requiresAdmin = to.matched.some((record) => record.meta.requiresAdmin);
 
   if (requiresAdmin) {
-    const authStore = useAuthStore();
     // 未登入或不是管理員，一律導回首頁
     if (!authStore.token || !authStore.user?.isAdmin) {
       return { name: 'home' };
