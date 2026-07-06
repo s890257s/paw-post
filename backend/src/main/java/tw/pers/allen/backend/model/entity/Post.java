@@ -34,7 +34,6 @@ public class Post {
     @Lob
     private byte[] imageData;
 
-    // 圖片的 MIME type (例如 image/jpeg、image/webp)，與圖片內容一起保存
     private String imageContentType;
 
     private String description;

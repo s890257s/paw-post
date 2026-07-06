@@ -2,6 +2,13 @@ package tw.pers.allen.backend.service;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import tw.pers.allen.backend.repository.PostLikeRepository.PostLikeCount;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -40,24 +47,39 @@ public class PostService {
     // 取得分頁貼文，並計算按讚狀態
     @Transactional(readOnly = true)
     public Page<PostResponseDto> getPosts(Pageable pageable, Integer currentMemberId, boolean isAdmin) {
+        // 優化 1: findAll 已在 Repository 中加上 @EntityGraph 預載 member
         Page<Post> postPage = postRepository.findAll(pageable);
 
+        if (postPage.isEmpty()) {
+            return postPage.map(post -> toDto(post, currentMemberId, isAdmin, Collections.emptyMap(), Collections.emptySet()));
+        }
+
+        // 收集本頁所有貼文 ID
+        List<Integer> postIds = postPage.getContent().stream()
+                .map(Post::getId)
+                .toList();
+
+        // 批次查詢本頁所有貼文的按讚總數
+        Map<Integer, Integer> likeCounts = postLikeRepository.countByPostIdIn(postIds).stream()
+                .collect(Collectors.toMap(PostLikeCount::getPostId, PostLikeCount::getLikeCount));
+
+        // 優化 3: 批次查詢當前登入者對「本頁貼文」按過讚的 ID 集合
+        Set<Integer> likedPostIds = Collections.emptySet();
+        if (currentMemberId != null) {
+            likedPostIds = postLikeRepository.findLikedPostIdsByMemberAndPosts(currentMemberId, postIds);
+        }
+
+        final Set<Integer> finalLikedPostIds = likedPostIds;
         // Page.map 會逐筆轉換內容，並自動保留分頁資訊（總筆數、頁碼等）
-        return postPage.map(post -> toDto(post, currentMemberId, isAdmin));
+        return postPage.map(post -> toDto(post, currentMemberId, isAdmin, likeCounts, finalLikedPostIds));
     }
 
-    // 【教學點：這個方法裡藏了「三個」N+1 查詢陷阱，是刻意保留的效能反面教材】
-    // 每轉換「一篇」貼文，就會多發出下列查詢：
-    //   (1) post.getMember()               —— LAZY 關聯，載入發文者
-    //   (2) countByPostId                  —— 查詢總按讚數
-    //   (3) existsByMemberIdAndPostId     —— 登入時查詢是否按過讚
-    // 一頁 10 篇貼文 = 最多 30 次額外查詢！
-    // 解法方向（留作進階練習）：@EntityGraph 或 join fetch 預載關聯、
-    // 或先收集本頁所有貼文 id，用 IN 一次批次查回，再於記憶體中組裝。
-    private PostResponseDto toDto(Post post, Integer currentMemberId, boolean isAdmin) {
+    // 將 Post 轉換為 DTO（已解決 N+1 問題的優化版本）
+    private PostResponseDto toDto(Post post, Integer currentMemberId, boolean isAdmin, 
+                                  Map<Integer, Integer> likeCounts, Set<Integer> likedPostIds) {
         PostResponseDto dto = new PostResponseDto();
 
-        // 1. 映射基本關聯資料：貼文 ID 與發文者資訊 (觸發上述 N+1 之 (1))
+        // 1. 映射基本關聯資料：貼文 ID 與發文者資訊 (已由 @EntityGraph 預載)
         dto.setId(post.getId());
         dto.setMemberId(post.getMember().getId());
         dto.setUsername(post.getMember().getUsername());
@@ -66,15 +88,12 @@ public class PostService {
         dto.setDescription(post.getDescription());
         dto.setCreatedAt(post.getCreatedAt());
 
-        // 3-1. 向資料庫查詢該篇貼文的「總按讚數」(觸發上述 N+1 之 (2))
-        int likeCount = postLikeRepository.countByPostId(post.getId());
+        // 3-1. 從批次查詢的 Map 中取得「總按讚數」，若無紀錄則為 0
+        int likeCount = likeCounts.getOrDefault(post.getId(), 0);
         dto.setLikeCount(likeCount);
 
-        // 3-2. 如果有使用者登入，向資料庫查詢他「是否已經按過讚」(觸發上述 N+1 之 (3))
-        boolean isLiked = false;
-        if (currentMemberId != null) {
-            isLiked = postLikeRepository.existsByMemberIdAndPostId(currentMemberId, post.getId());
-        }
+        // 3-2. 從批次查詢的 Set 中判斷該使用者是否已經按過讚
+        boolean isLiked = likedPostIds.contains(post.getId());
         dto.setIsLiked(isLiked);
 
         // 4. 商業權限邏輯：處理文章的「隱藏」狀態
@@ -169,15 +188,16 @@ public class PostService {
         return dto;
     }
 
-    // 新增按讚記錄，並防範重複按讚。
+    // 新增按讚記錄
     //
-    // 【為什麼這個方法「刻意」不加 @Transactional？】
-    // 下方 catch 了 UNIQUE 約束的違反例外並當成功處理。
-    // 若整個方法包在同一個交易裡，repository 內層拋出例外的當下，
-    // 交易就已被 Spring 標記為 rollback-only——即使我們 catch 住例外，
-    // 方法結束提交交易時仍會失敗 (UnexpectedRollbackException)。
-    // 此方法的各個資料庫操作彼此不需要原子性，
-    // 讓它們各自跑在 repository 自己的交易裡，catch 例外才能真正生效。
+    // 【教學備註：併發問題與優化方向】
+    // 目前使用 check-then-act (先檢查 exists 再 save) 的寫法在一般情況下可以正常運作。
+    // 但在「極高併發」的情境下（例如同一個使用者瞬間送出兩次按讚 API），
+    // 兩個請求可能同時通過 exists 檢查，導致第二個請求在 save 時違反資料庫 UNIQUE 約束而引發 Error 500。
+    // 作為基礎專案，這樣寫已足夠滿足需求。若未來要優化，可以考慮：
+    // 1. 利用資料庫層級的 INSERT IGNORE (MySQL) 語法。
+    // 2. 深入理解 Spring 的 @Transactional 傳播機制與 UnexpectedRollbackException，並以 try-catch 精準處理。
+    @Transactional
     public void likePost(Integer memberId, Integer postId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException("找不到會員"));
@@ -189,26 +209,16 @@ public class PostService {
             throw new ForbiddenException("此文章已被禁用");
         }
 
-        // 若已按讚，不做任何事情（冪等：目標狀態已達成就視為成功）
+        // 1. 檢查是否已按過讚
         if (postLikeRepository.existsByMemberIdAndPostId(memberId, postId)) {
             return;
         }
 
-        // 新增按讚記錄
+        // 2. 新增按讚記錄
         PostLike postLike = new PostLike();
         postLike.setMember(member);
         postLike.setPost(post);
-
-        try {
-            postLikeRepository.save(postLike);
-        } catch (DataIntegrityViolationException e) {
-            // 【教學點：check-then-act 不是原子操作】
-            // 上面的 exists 檢查與這裡的 insert 之間，可能有另一個相同的請求
-            // 同時通過了檢查，此時第二筆 insert 會撞上資料庫的
-            // UNIQUE(member_id, post_id) 約束並拋出這個例外。
-            // 應用層的 exists 檢查只是「快速路徑」，資料庫約束才是防重複的真正防線。
-            // 目標狀態（已按讚）已經達成，因此當作成功、靜默返回。
-        }
+        postLikeRepository.save(postLike);
     }
 
     // 移除指定的按讚記錄

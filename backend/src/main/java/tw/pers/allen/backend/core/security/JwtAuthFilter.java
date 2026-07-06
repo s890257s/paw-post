@@ -113,10 +113,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return true;
         }
 
-        // 本機開發工具（注意：若要部署上線，這兩者不可原樣公開）
-        if (path.startsWith("/h2-console")) {
-            return true;
-        }
+        // 本機開發工具（注意：若要部署上線，不可原樣公開）
         if (path.startsWith("/actuator")) {
             return true;
         }

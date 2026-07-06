@@ -1,0 +1,9 @@
+-- 會員(依賴:無 → 編號 10)
+-- 文字欄位一律用 NVARCHAR:VARCHAR 存中文會因定序變成 ???
+CREATE TABLE member (
+  id INT IDENTITY(1,1) PRIMARY KEY,
+  username NVARCHAR(255) NOT NULL UNIQUE,
+  password NVARCHAR(255) NOT NULL,
+  role NVARCHAR(20) DEFAULT 'USER',
+  created_at DATETIME2 DEFAULT CURRENT_TIMESTAMP
+);
