@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "app.db.reset",
+  "type": "java.lang.String",
+  "description": "是否重置 DB"
+}]}

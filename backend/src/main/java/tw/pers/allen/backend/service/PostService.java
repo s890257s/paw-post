@@ -8,9 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import tw.pers.allen.backend.repository.PostLikeRepository.PostLikeCount;
-
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,6 +25,7 @@ import tw.pers.allen.backend.model.entity.Post;
 import tw.pers.allen.backend.model.entity.PostLike;
 import tw.pers.allen.backend.repository.MemberRepository;
 import tw.pers.allen.backend.repository.PostLikeRepository;
+import tw.pers.allen.backend.repository.PostLikeRepository.PostLikeCount;
 import tw.pers.allen.backend.repository.PostRepository;
 
 // 處理貼文建立、列表查詢與按讚邏輯
