@@ -12,14 +12,14 @@ import java.util.List;
 
 // 設定全域 CORS 跨來源資源共用
 //
-// 【為什麼用 CorsFilter 而不是 WebMvcConfigurer.addCorsMappings？】
-// addCorsMappings 的 CORS 處理發生在 Spring MVC（DispatcherServlet）層。
+// 【教學點】為什麼用 CorsFilter 而不是 WebMvcConfigurer.addCorsMappings？
+// addCorsMappings 的 CORS 處理發生在 Spring MVC 層,也就是 DispatcherServlet。
 // 但本專案的 JwtAuthFilter 是 Servlet Filter，執行順序在 MVC「之前」——
 // 當 JwtAuthFilter 直接回 401 時，回應根本沒進到 MVC，
 // 也就不會被加上 Access-Control-Allow-Origin header。
 // 瀏覽器收到沒有 CORS header 的回應會直接擋掉，
 // 前端 axios 只會看到「網路錯誤」而不是 401，非常難除錯。
-// 因此改用 CorsFilter（Servlet Filter 層級），並確保它排在 JwtAuthFilter 之前。
+// 因此改用 Servlet Filter 層級的 CorsFilter，並確保它排在 JwtAuthFilter 之前。
 @Configuration
 public class WebConfig {
 
@@ -28,10 +28,10 @@ public class WebConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // 教學專案允許所有來源方便本機開發。
-        // 注意：這裡「不能」同時設定 setAllowCredentials(true)——
-        // 「任意來源 + 允許憑證(cookie)」是危險組合，等於任何網站都能帶著
+        // 【安全】這裡「不能」同時設定 setAllowCredentials(true)——
+        // 「任意來源 + 允許 cookie 憑證」是危險組合，等於任何網站都能帶著
         // 使用者的 cookie 打你的 API。本專案的身分驗證走 Authorization header
-        // （不是 cookie），因此完全不需要 credentials。
+        // 而非 cookie，因此完全不需要 credentials。
         config.setAllowedOriginPatterns(List.of("*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));

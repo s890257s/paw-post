@@ -1,4 +1,4 @@
--- 會員(依賴:無 → 編號 10)
+-- 會員。依賴:無 → 編號 10
 -- 文字欄位一律用 NVARCHAR:VARCHAR 存中文會因定序變成 ???
 CREATE TABLE member (
   id INT IDENTITY(1,1) PRIMARY KEY,

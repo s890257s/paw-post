@@ -1,16 +1,9 @@
 package tw.pers.allen.backend.core.exception;
 
-/**
- * 未授權例外
- * 用於表示當前請求缺少有效的驗證憑證或身分驗證失敗
- */
+// 代表「未登入或憑證無效」的例外，對應 HTTP 401 Unauthorized。
+// 與 403 的 ForbiddenException 語意不同——那是已登入但權限不足。
 public class UnauthorizedException extends RuntimeException {
 
-    /**
-     * 建立帶有錯誤訊息的未授權例外
-     *
-     * @param message 錯誤詳細訊息
-     */
     public UnauthorizedException(String message) {
         super(message);
     }

@@ -3,20 +3,18 @@ import { ref, onMounted, watch } from 'vue';
 import { getPosts } from '@/api/post';
 import { useFeedStore } from '@/stores/feed';
 import PostCard from '@/components/PostCard.vue';
-import { useToast } from 'vue-toastification';
 
-const toast = useToast();
 const feedStore = useFeedStore();
 const posts = ref([]);
 const page = ref(0);
 const totalPages = ref(1);
 const isLoading = ref(false);
 
-// 【已知取捨 1：offset 分頁的位移】停在列表時若有人發了新文，
+// 【進階】已知取捨 1——offset 分頁的位移：停在列表時若有人發了新文，
 // 「載入更多」抓下一頁時同一篇貼文可能被擠到下一頁而重複出現。
-// 正解是 cursor-based pagination（見 README 進階課題），教學版接受此現象。
-// 【已知取捨 2】下面的 isLoading 防連點會把「載入中收到的刷新訊號」一起擋掉，
-// 正解需要請求取消 (AbortController) 或佇列，超出本課程範圍。
+// 正解是 cursor-based pagination，見 README 進階課題，教學版接受此現象。
+// 【進階】已知取捨 2：下面的 isLoading 防連點會把「載入中收到的刷新訊號」一起擋掉，
+// 正解需要 AbortController 請求取消或佇列，超出本課程範圍。
 const loadPosts = async (reset = false) => {
   if (isLoading.value) return;
   
@@ -57,7 +55,7 @@ onMounted(() => {
 });
 
 // 監聽 feed store 的刷新訊號：Navbar 的 UploadDialog 發文成功後會觸發，
-// 這裡重新載入列表，新貼文（依 createdAt 降序）就會出現在最頂端
+// 這裡重新載入列表，貼文依 createdAt 降序，新貼文就會出現在最頂端
 watch(() => feedStore.refreshSignal, () => {
   loadPosts(true);
 });

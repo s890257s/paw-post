@@ -1,4 +1,4 @@
--- 按讚假資料(member_id、post_id 分別對應 10_member.sql、20_post.sql 明確指定的 id)
+-- 按讚假資料。member_id、post_id 分別對應 10_member.sql、20_post.sql 明確指定的 id
 SET IDENTITY_INSERT post_like ON;
 INSERT INTO post_like (id, member_id, post_id) VALUES
 (1, 1, 3),

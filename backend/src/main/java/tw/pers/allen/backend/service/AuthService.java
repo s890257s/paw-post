@@ -21,7 +21,7 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final JwtUtil jwtUtil;
 
-    // BCrypt 密碼驗證器（spring-security-crypto 提供），
+    // BCrypt 密碼驗證器，由 spring-security-crypto 提供，
     // 與資料庫中既有的 $2a$ 開頭 hash 完全相容
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 

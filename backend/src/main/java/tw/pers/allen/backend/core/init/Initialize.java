@@ -14,8 +14,8 @@ import lombok.RequiredArgsConstructor;
 import tw.pers.allen.backend.model.entity.Post;
 import tw.pers.allen.backend.repository.PostRepository;
 
-// 應用啟動後執行：為 data.sql 建立的種子貼文載入示範照片
-// (照片檔以貼文 id 命名，放在 resources/init/photo/ 下)
+// 應用啟動後執行：為 data.sql 建立的種子貼文載入示範照片。
+// 照片檔以貼文 id 命名，放在 resources/init/photo/ 下
 @Component
 @RequiredArgsConstructor
 public class Initialize implements ApplicationRunner {
@@ -36,8 +36,8 @@ public class Initialize implements ApplicationRunner {
         for (Post p : posts) {
             ClassPathResource resource = new ClassPathResource("init/photo/%s.webp".formatted(p.getId()));
 
-            // 找不到對應照片就跳過，不讓整個應用啟動失敗
-            // (例如學生在 data.sql 加了新貼文，卻沒有放對應的照片檔)
+            // 找不到對應照片就跳過，不讓整個應用啟動失敗——
+            // 例如學生在 data.sql 加了新貼文，卻沒有放對應的照片檔
             if (!resource.exists()) {
                 log.warn("找不到貼文 {} 的示範照片 (init/photo/{}.webp)，略過。", p.getId(), p.getId());
                 continue;

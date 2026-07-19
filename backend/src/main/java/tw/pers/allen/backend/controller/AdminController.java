@@ -18,13 +18,13 @@ import tw.pers.allen.backend.model.dto.AdminPostSummaryDto;
 import tw.pers.allen.backend.service.PostService;
 
 // 後台管理 API。
-// JwtAuthFilter 只驗證「是否登入」(401)，「是否為管理員」的授權檢查在這裡進行 (403)。
+// JwtAuthFilter 只驗證「是否登入」、擋 401；「是否為管理員」的授權檢查在這裡進行、回 403。
 @RestController
 @RequestMapping("/api/admin/posts")
 @RequiredArgsConstructor
 public class AdminController {
 
-    // 單頁筆數上限（與 PostController 相同的參數防禦，理由見該處說明）
+    // 單頁筆數上限。與 PostController 相同的參數防禦，理由見該處說明
     private static final int MAX_PAGE_SIZE = 50;
 
     private final PostService postService;

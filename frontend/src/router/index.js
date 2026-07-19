@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-// 「@」是 src 資料夾的別名（設定見 vite.config.js 與 jsconfig.json），
+// 「@」是 src 資料夾的別名，設定見 vite.config.js 與 jsconfig.json。
 // 專案內的 import 統一使用 @，路徑不會因檔案搬移而跟著改
 import UserLayout from '@/layouts/UserLayout.vue'
 import AdminLayout from '@/layouts/AdminLayout.vue'
@@ -47,7 +47,7 @@ const router = createRouter({
 })
 
 // 全域導航守衛：進入每個路由前執行。
-// 注意：前端守衛只是「使用者體驗」層的防線（避免看到打不開的頁面），
+// 【安全】前端守衛只是「使用者體驗」層的防線，避免看到打不開的頁面；
 // 真正的權限防線在後端 API —— 就算有人繞過前端，後端仍會回 401 / 403。
 router.beforeEach((to) => {
   const authStore = useAuthStore();

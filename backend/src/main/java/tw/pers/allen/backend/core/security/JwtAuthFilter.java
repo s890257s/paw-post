@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 // 自訂過濾器，用於攔截 HTTP 請求並驗證 JWT Token
-// @Order 設定為「最高優先權 + 1」：CORS Filter (最高優先權) 必須先執行，
+// @Order 設定為「最高優先權 + 1」：CORS Filter 是最高優先權、必須先執行，
 // 否則此 Filter 直接回傳的 401 會缺少 CORS header，瀏覽器會擋下回應，
 // 前端就只能看到「網路錯誤」而看不到真正的 401。
 @Component
@@ -38,7 +38,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             if (hasValidToken) {
                 // 記錄登入者身分與角色。
-                // 【為什麼用 ThreadLocal？】Servlet 容器以「一條執行緒處理一個請求」，
+                // 【教學點】為什麼用 ThreadLocal？Servlet 容器以「一條執行緒處理一個請求」，
                 // 把身分存進 ThreadLocal，同一請求後續的 Controller / Service
                 // 不需要層層傳參數也能取得登入者資訊。
                 Integer memberId = jwtUtil.getMemberIdFromToken(jwt);
@@ -56,12 +56,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 return;
             }
 
-            // 3. 其餘一律阻擋（回傳 JSON 格式，與 GlobalExceptionHandler 的 401 格式一致）
+            // 3. 其餘一律阻擋。回傳 JSON 格式，與 GlobalExceptionHandler 的 401 格式一致
             writeUnauthorizedResponse(response);
 
         } finally {
             // 4. 清理 ThreadLocal。
-            // 【為什麼一定要 clear？】容器的執行緒是「重複使用」的（Thread Pool），
+            // 【陷阱】為什麼一定要 clear？容器以 Thread Pool 重複使用執行緒，
             // 若不清除，下一個被分配到同一條執行緒的請求會讀到上一位使用者的身分，
             // 造成嚴重的資料污染；同時也會造成記憶體洩漏。
             LoggedInMemberHolder.clear();
@@ -77,8 +77,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     // 從 HTTP Header 中擷取 Bearer Token。
-    // 字串判空用 Spring 內建的 StringUtils——不要 import 日誌框架 (log4j) 內部的
-    // 工具類，那不是公開 API，只是恰好在 classpath 上的傳遞依賴，隨時可能異動。
+    // 【陷阱】字串判空用 Spring 內建的 StringUtils——不要 import 日誌框架內部的
+    // 同名工具類，那不是公開 API，只是恰好在 classpath 上的傳遞依賴，隨時可能異動。
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
@@ -87,18 +87,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         return null;
     }
 
-    // 判斷該請求路徑是否為「公開路徑」（不需登入即可存取）。
+    // 判斷該請求路徑是否為「公開路徑」——不需登入即可存取。
     //
-    // 【安全設計：預設拒絕 (fail-closed)】
+    // 【安全】預設拒絕,即 fail-closed。
     // 這裡採白名單：明確列出公開路徑，「其餘一律要求登入」。
-    // 若反過來寫（列出需要保護的路徑、其他放行，即 fail-open），
+    // 若反過來寫——列出需要保護的路徑、其他放行，即 fail-open——
     // 未來新增的 API 會預設公開，忘記回來補名單就是安全漏洞。
     // Spring Security 慣例中最後一條 .anyRequest().authenticated() 正是同一個道理。
     private boolean isPublic(HttpServletRequest request) {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        // CORS 的 Preflight 請求 (OPTIONS) 永遠放行
+        // CORS 的 Preflight 請求永遠放行
         if (method.equalsIgnoreCase("OPTIONS")) {
             return true;
         }
@@ -108,17 +108,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return true;
         }
 
-        // 取得貼文列表：不需登入（帶有效 Token 時才會計算 isLiked）
+        // 取得貼文列表：不需登入。帶有效 Token 時才會計算 isLiked
         if (path.equals("/api/posts") && method.equalsIgnoreCase("GET")) {
             return true;
         }
 
-        // 本機開發工具（注意：若要部署上線，不可原樣公開）
+        // 本機開發工具。注意：若要部署上線，不可原樣公開
         if (path.startsWith("/actuator")) {
             return true;
         }
 
-        // 預設拒絕：所有未列名的路徑（含未來新增的 API）一律要求登入
+        // 預設拒絕：所有未列名的路徑一律要求登入，包含未來新增的 API
         return false;
     }
 }

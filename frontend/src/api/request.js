@@ -4,13 +4,13 @@ import { useToast } from "vue-toastification";
 import router from "../router";
 
 const instance = axios.create({
-    // API 位址不寫死在程式裡，改由環境變數提供（見 .env.development），
+    // API 位址不寫死在程式裡，改由環境變數提供，見 .env.development——
     // 部署到正式環境時只要換設定檔，不用改程式
     baseURL: import.meta.env.VITE_API_BASE_URL,
     // 上傳圖片在較慢的網路可能超過 10 秒，放寬到 30 秒
     timeout: 30000,
-    // 不需要手動設定 Content-Type：axios 會依資料型別自動處理
-    // （傳物件 → application/json、傳 FormData → multipart/form-data 並補上 boundary）
+    // 不需要手動設定 Content-Type：axios 會依資料型別自動處理——
+    // 傳物件是 application/json、傳 FormData 是 multipart/form-data 並補上 boundary
 });
 
 // 請求攔截
@@ -38,7 +38,7 @@ instance.interceptors.response.use(
     },
     (error) => {
         // 在攔截器「內部」呼叫 useToast()，理由同上方的 useAuthStore()：
-        // 確保拿到的是 main.js 註冊的同一個 Toast 實例（設定只需維護一份）
+        // 確保拿到的是 main.js 註冊的同一個 Toast 實例，設定只需維護一份
         const toast = useToast();
 
         if (!error.response) {
@@ -46,12 +46,12 @@ instance.interceptors.response.use(
             return Promise.reject(error);
         }
 
-        // 使用 ?. (Optional Chaining) 防止後端沒有回傳 JSON 格式時發生「找不到屬性」的程式錯誤 (TypeError)
+        // 使用 ?. 也就是 Optional Chaining，防止後端沒有回傳 JSON 格式時發生「找不到屬性」的 TypeError
         const backendMsg = error.response?.data?.message || error.response?.data?.error;
 
         switch (error.response.status) {
             case 401: {
-                // 【特例】登入 API 本身的 401 代表「帳號或密碼錯誤」，
+                // 【陷阱】登入 API 本身的 401 代表「帳號或密碼錯誤」，
                 // 不是「登入狀態失效」，不能登出跳轉，否則錯誤訊息會被頁面跳轉吃掉。
                 // 用「完全相等」而非 includes() 比對，避免未來其他路徑剛好包含 login 而誤中
                 if (error.config?.url === "/login") {

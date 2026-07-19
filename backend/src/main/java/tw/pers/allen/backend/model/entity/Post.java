@@ -8,12 +8,12 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
-// 【為什麼不用 @Data？】JPA Entity 使用 @Data 有兩個經典地雷：
+// 【陷阱】為什麼 Entity 不用 @Data？因為有兩個經典地雷：
 // 1. toString() 會印出所有欄位 —— 這裡的 imageData 是整張圖片的 byte[]，一進 log 就是災難。
 // 2. equals()/hashCode() 會用到 Lazy 關聯欄位，可能觸發意外查詢或 LazyInitializationException。
 // 因此 Entity 只用 @Getter / @Setter。
 //
-// 【欄位命名對映】Spring Boot 預設的命名策略會自動把 camelCase 轉成 snake_case：
+// 【教學點】欄位命名對映：Spring Boot 預設的命名策略會自動把 camelCase 轉成 snake_case：
 //   Post → post、createdAt → created_at、isHidden → is_hidden、
 //   @ManyToOne 關聯欄位 member → member_id。
 // 因此不需要逐欄寫 @Table(name=...) / @Column(name=...)，

@@ -1,4 +1,7 @@
 <script setup>
+// 登入頁。
+// HTTP 錯誤的 toast 由 request.js 的回應攔截器統一發出,
+// 這裡的 catch 只留 console.error,避免同一個錯誤跳出兩則訊息
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';

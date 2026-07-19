@@ -39,14 +39,14 @@ public class PostController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        // 【參數防禦】這是「免登入」的重查詢 API（回應含整頁圖片的 Base64）：
+        // 【安全】參數防禦:這是「免登入」的重查詢 API，回應含整頁圖片的 Base64：
         // - size 不設上限，任何人都能用 size=10000 打出一發極重的查詢
         // - page/size 為負數會讓 PageRequest.of 直接拋例外，變成 500
-        // 這裡採「靜默修正」(clamp)，與多數公開 API（如 GitHub）的慣例一致
+        // 這裡採「靜默修正」，也就是 clamp——與 GitHub 等多數公開 API 的慣例一致
         int safePage = Math.max(page, 0);
         int safeSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
 
-        // 依規格：貼文固定以 createdAt 降序排列（最新的在最前面）。
+        // 依規格：貼文固定以 createdAt 降序排列，最新的在最前面。
         // 再以 id 降序當第二排序鍵：種子資料是同一批寫入的，createdAt 完全相同，
         // 若沒有第二排序鍵，相同時間的貼文順序就不穩定
         Sort sort = Sort.by("createdAt").descending().and(Sort.by("id").descending());

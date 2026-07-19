@@ -4,7 +4,7 @@ import { compressImage } from '@/utils/image';
 import { createPost } from '@/api/post';
 import { useToast } from 'vue-toastification';
 
-// defineModel (Vue 3.4+)：讓父元件的 v-model 直接對應這個 ref，
+// defineModel 是 Vue 3.4 起提供的巨集：讓父元件的 v-model 直接對應這個 ref，
 // 讀寫 dialog 就等於讀寫父層傳入的值，不必再手動宣告 props + emit 同步
 const dialog = defineModel({ type: Boolean });
 
@@ -17,7 +17,7 @@ const description = ref('');
 const selectedFile = ref(null);
 const previewUrl = ref('');
 
-// 綁定 template 裡的 <input type="file">（對應 ref="fileInput" 屬性）
+// 綁定 template 裡的 <input type="file">，對應其 ref="fileInput" 屬性
 const fileInput = ref(null);
 
 // 對話框關閉時清空表單
@@ -51,7 +51,7 @@ const handleFileChange = (event) => {
   };
   reader.readAsDataURL(file);
 
-  // 清空 input 的值：change 事件只在「值改變」時觸發，
+  // 【陷阱】清空 input 的值：change 事件只在「值改變」時觸發，
   // 若不清空，使用者取消後再選「同一張」圖片會沒有反應
   event.target.value = '';
 };
@@ -68,7 +68,7 @@ const submitPost = async () => {
     const compressedBlob = await compressImage(selectedFile.value, 1200, 0.8);
     
     // 準備 FormData。壓縮輸出固定是 JPEG，
-    // 檔名的副檔名也換成 .jpg（例如 cat.png → cat.jpg），避免名實不符
+    // 檔名的副檔名也換成 .jpg，例如 cat.png 變成 cat.jpg，避免名實不符
     const fileName = selectedFile.value.name.replace(/\.\w+$/, '') + '.jpg';
     const formData = new FormData();
     formData.append('image', compressedBlob, fileName);

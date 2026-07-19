@@ -29,7 +29,7 @@ export const compressImage = (file, maxWidth = 800, quality = 0.8) => {
                 canvas.height = height;
                 const ctx = canvas.getContext('2d');
 
-                // 先鋪白色底：JPEG 不支援透明，若不鋪底，
+                // 【陷阱】先鋪白色底：JPEG 不支援透明，若不鋪底，
                 // 透明背景的 PNG 轉出來會變成黑底
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, width, height);

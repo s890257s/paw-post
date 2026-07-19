@@ -13,20 +13,20 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 開發用「拋棄式資料庫」重置器:在 Spring 啟動前,整顆 DROP 掉再重建,
- * 讓每次啟動都像 in-memory 資料庫一樣從乾淨狀態開始
- * (之後由 spring.sql.init 執行 init/schema、init/data 重建資料)。
+ * 讓每次啟動都像 in-memory 資料庫一樣從乾淨狀態開始,
+ * 之後由 spring.sql.init 執行 init/schema、init/data 重建資料。
  *
  * ⚠⚠⚠ 正式專案絕對禁止使用這個技巧,原因有三 ⚠⚠⚠
  * 1. 正式資料庫裡的資料就是公司資產,「啟動即刪庫」等於啟動即毀損資料。
  * 2. 最小權限原則:應用程式帳號在正式環境根本不該擁有 DROP DATABASE 權限。
- * 3. 正式環境的資料表演進靠 migration 工具(如 Flyway),不靠砍掉重練。
+ * 3. 正式環境的資料表演進靠 Flyway 等 migration 工具,不靠砍掉重練。
  *
  * 其他已知限制:
  * - 這裡用 java.util.Properties「手動」讀 application.properties,
  *   因為此時 Spring 還沒啟動。代價是 Spring 的 profile、環境變數、
  *   命令列參數等覆寫機制在這裡通通不生效——只認 application.properties 本尊。
  * - 因為專案掛了 devtools,main 在初次啟動會執行兩次、之後每次存檔熱重啟
- *   都會再執行一次(= 資料庫再次清空)。重置本身是冪等的,多跑只是慢一點。
+ *   都會再執行一次,資料庫也就再次清空。重置本身是冪等的,多跑只是慢一點。
  */
 public class DatabaseResetter {
 
@@ -35,7 +35,7 @@ public class DatabaseResetter {
 	/**
 	 * 讀取連線設定並重置資料庫。
 	 *
-	 * @return 是否真的做了重置(main 據此決定要不要執行 init 腳本)
+	 * @return 是否真的做了重置,main 據此決定要不要執行 init 腳本
 	 */
 	public static boolean run() {
 		try {
@@ -54,7 +54,7 @@ public class DatabaseResetter {
 			String host = parseHost(url);
 			String dbName = parseDatabaseName(url);
 
-			// 防禦性檢查:重置只允許對「本機」資料庫執行。
+			// 【安全】防禦性檢查:重置只允許對「本機」資料庫執行。
 			// 沒有這一道,連線字串哪天被改指向共用或正式伺服器,啟動就是刪庫。
 			if (!host.equalsIgnoreCase("localhost") && !host.equals("127.0.0.1")) {
 				throw new IllegalStateException(
@@ -62,14 +62,14 @@ public class DatabaseResetter {
 								.formatted(host));
 			}
 
-			// 不能 DROP 自己正連著的資料庫(而且第一次啟動時它根本還不存在),
+			// 不能 DROP 自己正連著的資料庫——而且第一次啟動時它根本還不存在——
 			// 所以改連到系統資料庫 master,在 master 上執行 DROP / CREATE。
 			String masterUrl = url.replace("databaseName=" + dbName, "databaseName=master");
 
 			try (Connection conn = DriverManager.getConnection(masterUrl, username, password);
 					Statement stmt = conn.createStatement()) {
 
-				// 先把佔用中的連線全部踢掉(例如開著的 SSMS 查詢視窗),否則 DROP 會失敗。
+				// 先把佔用中的連線全部踢掉,例如開著的 SSMS 查詢視窗,否則 DROP 會失敗。
 				// SINGLE_USER + ROLLBACK IMMEDIATE 同樣是正式環境的禁忌動作。
 				stmt.execute("""
 						IF DB_ID('%s') IS NOT NULL
@@ -100,8 +100,8 @@ public class DatabaseResetter {
 		return props;
 	}
 
-	// 取出 jdbc:sqlserver://「host」:port;... 的 host 部分
-	// (相容 localhost\SQLEXPRESS 這種具名執行個體寫法)
+	// 取出 jdbc:sqlserver://「host」:port;... 的 host 部分,
+	// 相容 localhost\SQLEXPRESS 這種具名執行個體寫法
 	private static String parseHost(String url) {
 		String afterSlashes = url.substring(url.indexOf("//") + 2);
 		String hostPart = afterSlashes.split(";")[0];

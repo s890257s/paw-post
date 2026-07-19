@@ -1,5 +1,5 @@
 <script setup>
-// defineProps / defineEmits 是編譯器巨集 (compiler macro)，不需要 import，
+// defineProps / defineEmits 是編譯器巨集，不需要 import，
 // import 反而會在 console 產生警告
 import { ref, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
@@ -17,11 +17,11 @@ const emit = defineEmits(['update-post']);
 const authStore = useAuthStore();
 const toast = useToast();
 
-// props 的欄位可以直接使用（如 template 裡的 post.username），
+// props 的欄位可以直接使用，例如 template 裡的 post.username；
 // 只有「需要加工」的資料才值得包成 computed，例如下面兩個：
 
 // 被禁用的文章是否要對「目前的觀看者」遮罩：
-// 後端對管理員不清空內容（方便判斷該不該解禁），所以管理員照常顯示、只加標記
+// 後端對管理員不清空內容——方便判斷該不該解禁——所以管理員照常顯示、只加標記
 const isMaskedForViewer = computed(() => props.post.isHidden && !authStore.user?.isAdmin);
 
 // 格式化日期顯示
@@ -40,6 +40,8 @@ const formattedDate = computed(() => {
 // 防止快速連點造成重複請求
 const isProcessing = ref(false);
 
+// props 唯讀,子元件不能直接修改 post。
+// 改用 emit 把更新後的資料交給父層替換——這是單向資料流的核心慣例
 const handleLike = async () => {
   if (!authStore.token) {
     toast.info('請先登入才能按讚喔！');
